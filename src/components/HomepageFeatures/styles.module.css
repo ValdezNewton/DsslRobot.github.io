@@ -1,0 +1,35 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 4rem 0;
+  width: 100%;
+}
+
+.featureSvg {
+  height: 200px;
+  width: 200px;
+}
+
+.featureTitle {
+  font-size: 1.5rem; /* Adjust as needed */
+  font-weight: bold;
+}
+
+.featureDescription {
+  font-size: 1.1rem; /* Adjust as needed */
+}
+
+.featureSpacing {
+  margin-bottom: 2rem; /* Adjust to increase space between images */
+}
+
+.featureColumn {
+  width: 100%; /* Adjust to make space between columns */
+  margin: 0 0.0001em; /* Add horizontal padding for more space */
+}
+
+.featuresContainer {
+  display: flex;
+  justify-content: space-between; /* Ensures even space between columns */
+  flex-wrap: wrap; /* Allows wrapping if screen is smaller */
+}
