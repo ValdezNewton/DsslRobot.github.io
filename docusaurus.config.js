@@ -16,7 +16,7 @@ const config = {
   favicon: 'img/dssl_log.ico',
 
   // Set the production url of your site here
-  url: 'https://DsslRobot.github.io/',
+  url: 'https://dsslrobot.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -25,7 +25,7 @@ const config = {
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'DsslRobot', // Usually your GitHub org/user name.
   projectName: 'DsslRobot.github.io', // Usually your repo name.
-  deploymentBranch: "gh-pages",
+  deploymentBranch: "main",
   trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -53,7 +53,7 @@ const config = {
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
           editUrl:
-            'https://DsslRobot.github.io/',
+            'https://dsslrobot.github.io/',
         },
         blog: {
           showReadingTime: true,
@@ -64,7 +64,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://DsslRobot.github.io/',
+            'https://dsslrobot.github.io/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -106,7 +106,7 @@ const config = {
             },
             {to: '/blog', label: 'Blog', position: 'left'},
             {
-              href: 'https://DsslRobot.github.io/',
+              href: 'https://dsslrobot.github.io/',
               label: 'GitHub',
               position: 'right',
             },
@@ -118,7 +118,7 @@ const config = {
             {
               title: 'Docs',
               items: [
-                {label: 'Docs', to: 'https://DsslRobot.github.io/'},
+                {label: 'Docs', to: 'https://dsslrobot.github.io/'},
               ],
             },
             {
@@ -126,7 +126,7 @@ const config = {
               items: [
                 {
                   label: 'Home',
-                  href: 'https://DsslRobot.github.io/',
+                  href: 'https://dsslrobot.github.io/',
                 },
               ],
             },
@@ -139,13 +139,13 @@ const config = {
                 },
                 {
                   label: 'GitHub',
-                  href: 'https://DsslRobot.github.io/',
+                  href: 'https://dsslrobot.github.io/',
                 },
               ],
             },
           ],
           copyright: `Copyright © ${
-              new Date().getFullYear()} DsslRobots@dssl_lab, Tsinghua University. Built with Docusaurus.`,
+              new Date().getFullYear()} dsslrobots@dssl_lab, Tsinghua University. Built with Docusaurus.`,
         },
         prism: {
           theme: prismThemes.github,
