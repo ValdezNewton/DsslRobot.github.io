@@ -52,7 +52,7 @@ const config = {
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
           editUrl:
-            'https://github.com/DsslRobot.github.io',
+            'https://DsslRobot.github.io/',
         },
         blog: {
           showReadingTime: true,
@@ -63,7 +63,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/DsslRobot.github.io',
+            'https://DsslRobot.github.io/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -105,7 +105,7 @@ const config = {
             },
             {to: '/blog', label: 'Blog', position: 'left'},
             {
-              href: 'https://github.com/DsslRobot.github.io',
+              href: 'https://DsslRobot.github.io/',
               label: 'GitHub',
               position: 'right',
             },
@@ -117,7 +117,7 @@ const config = {
             {
               title: 'Docs',
               items: [
-                {label: 'Docs', to: '/docs/Intro'},
+                {label: 'Docs', to: 'https://DsslRobot.github.io/'},
               ],
             },
             {
@@ -138,7 +138,7 @@ const config = {
                 },
                 {
                   label: 'GitHub',
-                  href: 'https://github.com/DsslRobot.github.io',
+                  href: 'https://DsslRobot.github.io/',
                 },
               ],
             },
