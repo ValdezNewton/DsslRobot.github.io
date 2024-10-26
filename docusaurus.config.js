@@ -138,7 +138,7 @@ const config = {
                 },
                 {
                   label: 'GitHub',
-                  href: 'https://dsslrobot.github.io/',
+                  href: 'https://github.com/DsslRobot',
                 },
               ],
             },
