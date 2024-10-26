@@ -9,7 +9,7 @@ We welcome contributions to DSSLRobot  gh pages! If you would like to contribute
 
 ### Method 1
 1. `fork` the repository to your own GitHub account, for example `glaciercoder/dsslrobot.github.io`.
-2. `clone` your repository and write your article (following the [project structure](https://DsslRobot.github.io/tinkerdocs/docs/Intro/project_structure)).
+2. `clone` your repository and write your article (following the [project structure](https://DsslRobot.github.io/docs/Intro/project_structure)).
 3. `commit` your changes and `push` them to your repository.
 4. Create a `pull request` to the `main` branch of the `DsslRobot/DsslRobot.github.io` repository.
 5. Wait for the `github actions` to build and deploy your changes to the site. Once the build is successful, your changes will be live on the site.
