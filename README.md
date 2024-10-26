@@ -1,5 +1,4 @@
 # DSSLRobot  gh pages
-action test
 
 DSSLRobot  gh pages is an open technical documentation platform for the DSSL Robot team, aimed at helping team members better learn and share knowledge related to robot development and provides the detailed deployment and usage for our robot platform and relavant alogrithms.
 DSSLRobot  gh pages is built with [Docusaurus 2](https://docusaurus.io/).
@@ -24,8 +23,8 @@ For more information, you can take a look at [how-to-fork-a-github-repository](h
    ```sh
    git checkout -b <branch_name>
    ```
-3. Write your article in the new branch 
-4. `commit` your changes and `push` them to remote repository.
+3. Write your article in the new branch
+4. `commit` your changes and `push` them to remote repository.(I suggest solve the conflict locally)
 5. Go to the remote repository and create a pull request.
 6. Solve the confict and merge your own branch to `main`
 7. Wait for the `github actions` to build and deploy your changes to the site. Once the build is successful, your changes will be live on the site.
