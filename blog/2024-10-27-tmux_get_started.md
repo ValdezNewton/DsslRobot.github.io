@@ -287,4 +287,4 @@ bind c new-window -c "#{pane_current_path}"
 
 ## Conclusion
 
-Now you've understand the basic usage of `tmux`, you can learn  [`tmuxinator`](/docs/Intro/tmuxinator_intro.md) to get yourself ready for the tmux automation.
+Now you've understand the basic usage of `tmux`, you can learn  [`tmuxinator`](/blog/2024-10-27-tmuxinator_intro.md) to get yourself ready for the tmux automation.
