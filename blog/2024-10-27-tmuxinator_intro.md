@@ -7,7 +7,7 @@ tags: [hello]
 
 # An Intro to `tmuxinator`
 
-> You should be familiar with `tmux` before reading this. If not, read [this doc](/blog/2024-10-27-tmux_get_started) first.
+> You should be familiar with `tmux` before reading this. If not, read [this doc](/blog/2024-10-27-tmux_get_started.md) first.
 
 Most of the time, you perform the same sequence of commands to setup Tinker. In navigation, you always start chassis, then lidar, then odometry, etc. Before `tmux` is used. Tinker members use shell scripts to automate this procedure. Tmux templating library provides an easy way to automate running same commands in `tmux` as well as organizing them into specific layout.
 <!-- truncate -->
