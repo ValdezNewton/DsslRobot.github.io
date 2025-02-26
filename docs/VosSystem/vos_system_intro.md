@@ -6,7 +6,9 @@ authors: [CabbageDog]
 
 # Vos system
 
-The Vos system is designed for controlling wheeled robot chassis with various wheel configurations, primarily targeting Independent Steering Independent Driving (ISID) architectures. It is adaptable for wheeled robot systems with different numbers of wheels and wheel placements. The system is designed based on ROS2 and ros2 control, offering excellent compatibility and modularity for different types of actuators.
+VOS stands for **V**ehicle **O**perating **S**ystem, which is designed for controlling wheeled robot chassis with various wheel configurations, primarily targeting Independent Steering Independent Driving (ISID) architectures. It is adaptable for wheeled robot systems with different numbers of wheels and wheel placements. The system is designed based on ROS2 and ros2 control, offering excellent compatibility and modularity for different types of actuators.
+
+![System Architecture](../../static/img/VOS_architecture.png)
 
 ## System Introducton
 
@@ -129,3 +131,24 @@ To use `kinco_system` for your robot, you should follow the steps below:
    - `scale_real_to_state`: coefficient to convert DEV to m/s or rad(by multiplication).
 2. Put kinco interface into your workspace: `git clone git@github.com:DsslRobot/kinco_interface.git`
 3. Modify the `bus.yaml` in `kinco_interface` package. The only thing needed changing is the `node_id` and wheel name.
+- `bus_config.yaml`: the configuration file for the CANopen node. Following configurations are needed:
+    - **Node ID Assignment**: Configure unique CAN node IDs for each motor, **THIS MUST MATCH SERVO STATION ID SETTING IN KINCO SOFTWARE**
+      - Steering motors: Typically 0x0B-0x0E (decimal 11-14) for LunarBOT and 0x01-0x06 (decimal 1-6) for universal platform.
+      - Driving motors: Typically 0x01-0x04 (decimal 1-4) for LunarBOT and 0x0B-0x10 (decimal 11-16) for universal platform.
+    
+    **FOLLOWING INDEX AND PARAMS CAN BE FOUND IN KINCO SERVO DOCS**
+    - **Motor Parameters**:
+      - `index: 0x6081`: Set rotation speed (e.g., 400000 = 400 rpm)
+      - `index: 0x6083`: Configure rotation acceleration (e.g., 200000 = 200 rpm/s²)
+      - `index: 0x6060`: Set operation mode (1=position mode for steering, ±3=velocity mode for driving)
+    - **PDO Mappings**:
+      - TPDO1: Map status word (0x6041) and position/velocity feedback
+      - RPDO1: Map control word (0x6040) and target position/velocity
+    - **Network Settings**:
+      - `baud_rate: 500` (500 kbps CAN bus speed) **THIS MUST MATCH USB_CAN DEVICE SETTINGs**, refer to [`docs/Hardware_Assembling_and_Debugging.md`](../LunarBot/Hardware%20Assembling%20and%20Debugging.md) for more details.
+      - `sync_period: 10000` (10ms synchronization interval)
+      - `master.node_id: 7` (CANopen master node ID)
+    - **Motor Enable Sequence**:
+      - Configure `index: 0x6040` with value `0x0000103f` for proper enable sequence
+
+- `kinco.eds`: the EDS file for the CANopen node.
