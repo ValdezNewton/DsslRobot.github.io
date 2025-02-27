@@ -84,7 +84,7 @@ And let's assume the name of the internal wifi card is `wlpaaaa`, and it's conne
 sudo nmcli connection modify "interface" autoconnect no
 sudo nmcli device down "interface"
 ```
-**!!!ATTENTION!!!** that <interface> should be the *CONNETION* name rather than *DEVICE* name.
+**!!!ATTENTION!!!** that "interface" should be the *CONNETION* name rather than *DEVICE* name.
 
 2. Verify the connection is disabled by:
 ```bash
