@@ -145,7 +145,7 @@ To use `kinco_system` for your robot, you should follow the steps below:
       - TPDO1: Map status word (0x6041) and position/velocity feedback
       - RPDO1: Map control word (0x6040) and target position/velocity
     - **Network Settings**:
-      - `baud_rate: 500` (500 kbps CAN bus speed) **THIS MUST MATCH USB_CAN DEVICE SETTINGs**, refer to [`docs/Hardware_Assembling_and_Debugging.md`](../LunarBot/Hardware%20Assembling%20and%20Debugging.md) for more details.
+      - `baud_rate: 500` (500 kbps CAN bus speed) **THIS MUST MATCH USB_CAN DEVICE SETTINGs**, refer to [`docs/Hardware_Assembling_and_Debugging.md`](../LunarRover/Hardware%20Assembling%20and%20Debugging.md) for more details.
       - `sync_period: 10000` (10ms synchronization interval)
       - `master.node_id: 7` (CANopen master node ID)
     - **Motor Enable Sequence**:
