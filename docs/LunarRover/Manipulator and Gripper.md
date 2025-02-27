@@ -78,7 +78,7 @@ ros2 topic echo /rm_driver/set_gripper_pick_on_result
 
 | Parameter | Description | Value Range | Notes |
 |-----------|-------------|-------------|--------|
-| `position` | Target position. | 1~1000 | 1~0mm, 1000~70mm |
+| `position` | Target position. | 1~1000 | 1 refers to 0mm, 1000 refers to 70mm |
 | `block` | Block or not? | true or false |  |
 
 Example command:
