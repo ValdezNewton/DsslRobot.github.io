@@ -69,18 +69,6 @@ const config = {
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
         },
-        bugs: {
-          sidebarPath: './sidebars.js',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          showLastUpdateAuthor: true,
-          showLastUpdateTime: true,
-          path: 'bugs',
-          remarkPlugins: [remarkMath],
-          rehypePlugins: [rehypeKatex],
-          editUrl:
-            'https://dsslrobot.github.io/',
-        },
         theme: {
           customCss: './src/css/custom.css',
         },
