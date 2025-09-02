@@ -52,6 +52,3 @@ Inside the chamber of the chassis, we got:
 
   * Realman RM-75 robot manipupator, 7-dof
   * Inspire Robots EG2-4C gripper
-
-
-
