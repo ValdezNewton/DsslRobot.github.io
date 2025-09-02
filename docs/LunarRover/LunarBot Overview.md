@@ -14,4 +14,4 @@ LunarBot是由DSSL机器人研究团队开发的月球探测车，使用ROS 2 Hu
 ## 概述
 LunarBot是一款为月球表面探测任务设计的智能移动探测车。它具备自主导航、环境感知、数据采集与传输功能，能够适应复杂的月球岩石表面环境。LunarBot配备了四轮独立驱动转向平台，每个车轮均配备有编码器的驱动电机和转向电机。其感知系统整合了Livox-Mid360 360°激光雷达、英特尔Realsense D435i相机以及惯性测量单元（IMU）。此外，车辆后顶还安装了一台Realman RM-75七自由度机械臂，末端执行器为双指抓取器。
 
-![LunarBot_Full_Body](../../static/img/LunarBot_Full_Body.png)
+![LunarBot](../../static/img/LunarBot.jpeg)
