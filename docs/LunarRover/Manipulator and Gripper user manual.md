@@ -8,7 +8,7 @@ last_update:
 
 ## Overview
 The Manipulator and Gripper system equips the Lunar Rover with dexterous manipulation capability.
-It consists of:
+It consists of: testing
 - Manipulator (arm): A Realman robotic arm, connected via Ethernet and powered with a 24V supply.
 - Gripper: An electrically actuated end-effector connected to the manipulator flange and controlled through ROS 2 nodes.
 This manual explains how to assemble, power up, and operate both the manipulator and gripper in simulation and real hardware.
