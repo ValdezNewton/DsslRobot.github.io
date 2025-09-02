@@ -1,8 +1,7 @@
 ---
 last_update:
   date: 09/01/2025
-  author: Bingqi
-  co-author: Isaac Hiew 
+  author: Isaac Hiew 
 ---
 
 # LunarBot Hardware User Manual

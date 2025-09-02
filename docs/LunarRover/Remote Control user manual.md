@@ -1,8 +1,7 @@
 ---
 last_update:
   date: 09/02/2025
-  author: CabbageDog
-  co-author: Isaac Hiew
+  author: Isaac Hiew
 ---
 
 # Remote Control
