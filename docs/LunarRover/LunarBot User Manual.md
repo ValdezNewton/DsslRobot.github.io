@@ -122,6 +122,7 @@ sudo ip link set can0 txqueuelen 1000
 sudo ip link set can0 up type can bitrate 500000
 ```
 These commands set a transmit queue length and bring up can0 with a 500 kbit/s bitrate (which matches the Kinco servo drivers’ CAN communication speed). Note: Replace "can0" with the actual CAN device name if different (use ifconfig -a or dmesg after plugging in the USB-CAN adapter to find the name). If the servos use a different bitrate, adjust the command accordingly. The CAN interface setup can also be automated via a startup script or using netplan/NetworkManager (see Chapter 3).
+
 5. Verify Connections: With the CAN bus configured, you will later verify communication by observing that each servo driver responds (for example, during the chassis bring-up in Operation, the drivers should indicate active status). If any servo does not respond, recheck its CAN cable and termination.
 
 By completing the above, all servo drivers are now networked to the onboard computer. The computer will be able to send motion commands to each wheel’s motor controller over this CAN bus. Keep the CAN and power cables separated where possible to reduce interference, and ensure the CAN adapter is securely attached to the PC (USB connection should be firm).
@@ -186,7 +187,7 @@ Network Architecture: There are typically three routers involved in a multi-rove
 
 Note: The above addresses assume a network scheme where all devices are in the 192.168.1.x range. Rover routers often use 192.168.1.1 as their gateway IP for their LAN, and assign dynamic IPs to connected devices (except where static IPs are set manually for consistency). The manipulators’ IP addresses (arm0, arm1) are typically fixed at the values shown for direct communication. If your network differs, substitute the appropriate values and record them. Unassigned fields should be configured and filled in by the user.
 
-## 3.1 Onboard Network COnfiguration
+## 3.1 Onboard Network Configuration
 The rover’s onboard computer needs to manage two network interfaces simultaneously: Wi-Fi (to communicate with the control PC through the rover’s router) and Ethernet (direct link to the manipulator). To avoid network conflicts and ensure stable routing, follow these configuration steps on the rover’s computer (Ubuntu):
 1. Disable Unnecessary Interfaces: The NUC may have its own Wi-Fi module. If you are using an external USB Wi-Fi connected to the rover’s router, it’s recommended to disable the internal Wi-Fi to prevent it from connecting to other networks (like a campus network) that could interfere. You can identify the internal Wi-Fi interface (for example, by temporarily unplugging the external adapter and running ifconfig or nmcli device status). Once identified (e.g., as wlp2s0 with a connection name like "Tsinghua-Secure"), disable it:
 ```bash
@@ -399,8 +400,134 @@ When you are finished operating the LunarBot, follow a safe shutdown procedure: 
 
 <br/>
 
+# 5. Summary of Important Command Lines
+## 5.1 Chassis & CAN bus
+```bash
+sudo ip link set can0 txqueuelen 1000
+sudo ip link set can0 up type can bitrate 500000
+```
+Brings up the CAN interface (e.g., `can0`) with a safe transmit queue and 5000 kbits/s bitrate for the wheel servo network. Use after plugging in the USB-CAN adapter. Tip: Find the real device name with `ifconfig-a` or `dmesg` 
 
-# 5. Maintenance
+## 5.2 Launching Control Stacks (ROS 2)
+```bash
+# 1) Joystick driver
+sudo xboxdrv --silent
+```
+Claims the Xbox wireless controller and feeds `/joy` events (quiet output). Keep this terminal open.
+
+```bash
+# 2) Chassis bring-up
+cd ~/Lunar_Rover_Hardware_Ws
+. install/setup.bash
+ros2 launch vos_bringup vos_bringup.launch.py
+```
+Starts the **Vehicle Operating System** controllers for drive/steer; look for "VOS_CONTROLLER IS ACTIVE."
+
+```bash
+# 3a) Manipulator bring-up (full RM-75 stack)
+ros2 launch rm_bringup rm_75_bringup.launch.py
+```
+Brings up the RM-75 driver, URDF, and (optionally) MoveIt2; expects the arm at `192.168.1.17`
+
+```bash
+# 3b) Manipulator-only (lightweight)
+ros2 launch rm_bringup rm_bringup.launch.py
+```
+Run the arm without the chassis stack (bench tests, isolated arm work)
+
+```bash
+# 4) Remote teleop node (maps joystick → rover/arm commands)
+ros2 launch lunar_rover_remote remote.launch.py
+```
+Enables Xbox teleoperationl; publishes chassis velocity and arm commands; bridges gripper actions.
+
+## 5.3 Gripper power & actions (via rm_driver)
+```bash
+# Enable 12V tool power for the gripper (do this once per session)
+ros2 topic pub --once /rm_driver/set_tool_voltage_cmd std_msgs/msg/UInt16 "{data: 2}"
+```
+Turns on the arm’s tool port (12 V) so the gripper is powered. You should see the fingers twitch/open. 
+
+### Mode 1 – Close until force threshold (gentle pick):
+```bash
+ros2 topic pub --once /rm_driver/set_gripper_pick_cmd rm_ros_interfaces/msg/Gripperpick "{speed: 200, force: 200, block: true}"
+ros2 topic echo /rm_driver/set_gripper_pick_result
+```
+Closes at speed=200 and stops at target force (~0.3 kg in this example). Echo the result to confirm success.
+
+### Mode 2 – Adaptive hold (re-grip if force drops):
+```bash
+ros2 topic pub --once /rm_driver/set_gripper_pick_on_cmd rm_ros_interfaces/msg/Gripperpick "{speed: 200, force: 200, block: false}"
+```
+Keeps monitoring grip; re-closes automatically if the object compresses/slips. Non-blocking. 
+
+### Mode 3 – Position control (open width target):
+```bash
+ros2 topic pub --once /rm_driver/set_gripper_position_cmd rm_ros_interfaces/msg/Gripperset "{position: 500, block: true}"
+ros2 topic echo /rm_driver/set_gripper_position_result
+```
+Moves to a target opening (here ≈ half-open). Use with care—no active force limit. 
+
+## 5.4 Low-level gripper driver (direct serial, advanced)
+```bash
+ros2 run inspire_gripper Gripper_control_node
+```
+Starts the serial driver with callable services (do not run alongside rm_driver). Useful for diagnostics or custom control. Key services include `SetID`, `Setopenlimit`, `Setmovetgt`, `Setmovemax`, `Setmovemin`, `Setmoveminhold`, `Setestop`, `Setparam`, `Getopenlimit`, `Getcopen`, `Getstatus`. Call them with `ros2 service call` when needed. 
+
+## 5.5 Network setup (so the PC talks to the arm & Wi-Fi nicely)
+```bash
+# Stop the internal Wi-Fi from autoconnecting to other networks
+sudo nmcli connection modify "Tsinghua-Secure" autoconnect no
+sudo nmcli device down wlp2s0
+```
+Prevents the onboard PC from drifting onto the wrong WLAN. 
+
+```bash
+# Give the wired NIC (to the arm) a static IP, no gateway
+nmcli connection modify "Wired connection 1" ipv4.addresses 192.168.1.100/24 ipv4.method manual
+nmcli connection modify "Wired connection 1" ipv4.gateway ""
+```
+Sets a fixed address for the arm link while keeping default routes free. 
+
+```bash
+# Keep Wi-Fi on DHCP for general comms
+nmcli connection modify "Wi-Fi connection 1" ipv4.method auto
+```
+Lets the rover’s Wi-Fi pull an IP from the onboard router. 
+
+
+```bash
+# Add a static route so arm traffic uses the wired link
+nmcli connection modify "Wired connection 1" +ipv4.routes "192.168.1.0/24 0.0.0.0"
+nmcli connection up "Wired connection 1"
+```
+Ensures packets to the 192.168.1.x arm subnet go out the Ethernet, not Wi-Fi. 
+
+```bash
+# Quick checks
+nmcli device status
+ip route
+ping 192.168.1.17
+```
+Verify link status, routing, and that the arm responds on the wire. 
+
+## 5.6 Serial/USB prerequisites for the gripper
+```bash
+# Serial library needed by the low-level driver
+git clone https://gitee.com/laiguanren/serial.git
+```
+Add the `serial` library to your workspace before building. 
+
+```bash
+# If the CH340 port is "grabbed" by brltty or missing permissions
+sudo apt remove brltty
+sudo chmod 777 /dev/ttyCH341USB0
+# Check device presence
+ls /dev/ttyCH341*
+```
+Fix common CH340/CH341 issues so `/dev/ttyCH341USB0` shows up and is accessible. 
+
+# 6. Maintenance
 
 Proper maintenance of the LunarBot ensures longevity and reliable performance. This section outlines routine maintenance tasks and checks that should be performed:
   - Mechanical Inspection: Regularly inspect all mechanical components for wear and integrity. Check that all bolts and screws are tight – especially those on the wheel assemblies, suspension, and manipulator mount. The vibration and shocks from motion can loosen fasteners over time. Use thread-locker on critical bolts if repeated loosening is observed. Inspect the wheel tires (if the rover has rubber tires or foam-filled wheels) for cracks or excessive wear, and replace or repair as necessary.
@@ -416,16 +543,16 @@ By following the above maintenance routines, the LunarBot will remain in optimal
 
 <br/>
 
-# Troubleshooting
+# 7. Troubleshooting
 
 Even with careful assembly and operation, you may encounter issues with the LunarBot. This section provides troubleshooting tips for common problems. If an issue arises, first ensure that all steps in the assembly and operation chapters were followed, then use the relevant category below to diagnose and resolve the problem.
 
-## 6.1 Power and Hardware Issues
+## 7.1 Power and Hardware Issues
 - Wheel not rotating or movement is jerky: If one or more wheels do not rotate smoothly or at all, first check the battery levels. A low 24 V battery can cause the servo drivers to undervolt, leading to jerky or no movement. Do not rely solely on the battery’s built-in indicator; use a multimeter to confirm voltage if possible. Ensure the 48 V drive battery is also sufficiently charged, as it directly powers the wheel motors. Next, inspect the power cables to the affected wheel’s servo driver – a loose phase wire (U, V, or W) can cause a motor to stutter. If the mechanical movement seems impeded, power off and inspect the wheel assembly for debris or mechanical binding.
 - Servos powering off automatically after startup: If the servo drivers initialize (you might hear a click or see an LED) but then shut down, it could be a protective feature triggering. Check the 48 V battery capacity – if it’s nearly depleted, the voltage might drop under load causing the servos to brown out. Another cause can be an overcurrent or short on one of the motor lines; servos will shut off to protect themselves. Inspect all motor wiring for shorts. It’s also possible the servo driver settings (in Kinco software) have a timeout or enable signal requirement – ensure the control software is enabling the drivers; if not, they might time out and disable. Finally, verify that the emergency stop or any kill-switch line isn’t inadvertently engaged.
 - Manipulator or gripper unresponsive (hardware): If the arm does not power on (no LED or sound from it) when you press its power, check the 24 V supply line dedicated to it. A blown fuse or tripped breaker in the 24 V line can silently prevent power delivery. Verify the manipulator’s power cable connection. If the gripper doesn’t respond even after enabling tool voltage, confirm that the gripper’s cable is properly seated at both the arm and gripper ends. Look at the connector pins for damage. Additionally, check if the gripper’s motor driver (if external or visible) has any LED indications. Some gripper drivers have tiny status LEDs that show faults (e.g., blinking if stalled).
 
-## 6.2 Control and Software Issues
+## 7.2 Control and Software Issues
 - No communication with servo drivers (CAN bus): If you launch vos_bringup and it fails to activate the VOS controller (chassis doesn’t respond), it indicates a CAN bus issue. Ensure the USB-CAN adapter is recognized (lsusb should show the device, and ifconfig or ip link should show can0 or similar after bringing it up). If not, try unplugging/replugging the adapter and re-run the setup commands. Check that the CAN bus termination is correctly set at both ends – improper termination can cause CAN traffic to not be received. Also verify that the servo drivers all have unique IDs and the software is addressing the correct IDs; if two drivers share an ID, neither will respond properly. If CAN bus communication still fails, swap out the CAN adapter if possible or test it on another system to isolate whether the adapter hardware might be faulty.
 - Manipulator driver cannot connect to arm: If rm_bringup reports it cannot find or connect to the manipulator, recheck the Ethernet configuration. Make sure the manipulator’s controller is indeed set to IP 192.168.1.17 (for rover 0) or the IP you expect – if not, you might need to consult the manipulator’s manual on how to set its IP. Confirm the rover PC’s Ethernet (192.168.1.100) is up (ifconfig should list it). Try pinging the arm’s IP (ping 192.168.1.17). If ping fails, there is a connection issue: possible causes are a bad Ethernet cable, or the route not set – double-check Chapter 3’s steps. If ping works but ROS still can’t connect, ensure that the ROS driver is pointing to the correct address/hostname for the arm. The RM-75 driver might require a configuration file with the arm’s IP. Also verify no firewall is blocking ports (generally not an issue on internal networks, but if ufw is enabled on the PC, allow the necessary range or disable ufw for testing).
 - Joystick not detected by xboxdrv: If running sudo xboxdrv --silent yields “No Xbox or SteelSeries controller found” or similar, the wireless receiver might not be recognized. Try the following: unplug the USB receiver and plug it back in, then run xboxdrv again. Ensure that no other process (like the built-in xpad driver) is conflicting – sometimes the Linux kernel’s default joystick driver might grab it. You might need to blacklist the xpad driver or run xboxdrv with --detach-kernel-driver. Also confirm the controller is in pairing mode when you start xboxdrv – the controller’s LED should cycle if not yet connected, and turn steady on the quadrant when connected. If using TeamViewer, ensure that the joystick is either connected to the rover PC or you have enabled joystick passthrough (TeamViewer can forward some USB devices, but reliability may vary). As a last resort, test the joystick on a local machine to ensure the controller and receiver are functional.
@@ -448,9 +575,9 @@ If an issue persists after trying the above, consider consulting additional reso
 
 <br/>
 
-# 7. Specifications
+# 8. Specifications
 This section lists the key technical specifications of the LunarBot, including physical dimensions and major component details.
-## 7.1 Physical Dimensions
+## 8.1 Physical Dimensions
 The LunarBot’s approximate dimensions (without certain attachments like solar panels or the manipulator) are given below:
 | **Dimension**      | **Value (mm)** | **Notes**                                     |
 | ------------------ | -------------- | --------------------------------------------- |
@@ -463,7 +590,7 @@ The LunarBot’s approximate dimensions (without certain attachments like solar 
 *Dimensions are subject to minor variations based on configuration.* The height will increase when the manipulator is mounted (the arm extends above the chassis). Ground clearance, wheel track, and wheelbase can be derived from the chassis design but are not listed here explicitly.
 
 
-## 7.2 Wheel Assemblies
+## 8.2 Wheel Assemblies
 The LunarBot is equipped with four identical wheel assemblies, each containing the following components:
   - Driving Motor: A 200 W brushless DC motor integrated with an encoder. This motor provides traction for the wheel, allowing the rover to move. The encoder offers precise feedback for velocity and position control of the wheel.
   - Steering Motor: A 100 W brushless DC motor, also with an integrated encoder, used to steer the wheel (rotate the wheel module to change direction). Each wheel can be turned independently, enabling omnidirectional movement (e.g., Ackermann steering or in-place rotation).
@@ -474,7 +601,7 @@ The LunarBot is equipped with four identical wheel assemblies, each containing t
 
 Note: The wheel assembly design allows easy replacement if needed (a modular approach). The encoders on the motors combined with the origin/limit sensors provide a closed-loop control system for both driving and steering.
 
-## 7.3 Chassis and Power System
+## 8.3 Chassis and Power System
 The sealed chassis chamber houses most of the core systems of the LunarBot:
 
 1. Power System: Inside the chassis are two graphene-based battery packs:
@@ -494,7 +621,7 @@ The sealed chassis chamber houses most of the core systems of the LunarBot:
 
 The chassis is designed to be robust and weather-resistant (to a degree, likely IP rating for dust). All external ports (power, Ethernet to arm, etc.) have sealed connectors.
 
-## 7.4 Sensor Suite
+## 8.4 Sensor Suite
 To navigate and perceive its environment, the LunarBot carries a suite of sensors:
   - LiDAR: A Livox Mid-360 LiDAR is mounted on the rover (often on a mast or at the front). This LiDAR provides a full 360° horizontal field of view and captures high-density point clouds of the surroundings. It is used for SLAM (Simultaneous Localization and Mapping), obstacle detection, and terrain mapping. The Mid-360 model has a range on the order of 100 m (for larger objects) and generates hundreds of thousands of points per second. Its data is published over Ethernet or USB (depending on model) to the onboard computer. The LiDAR requires 12 V power (often provided from the 24 V via a regulator) and time synchronization (via PTP or similar) for accurate integration into SLAM algorithms.
   - Depth Camera: An Intel RealSense D435i is included for visual and depth sensing. The D435i provides synchronized RGB video, depth information via stereo infrared cameras, and has an integrated Inertial Measurement Unit (IMU) (the “i” model). The RGB-D camera can detect obstacles, perform visual odometry (tracking the rover’s movement by feature tracking in images), and build local 3D models—especially of nearer objects that the LiDAR might miss (due to angle or resolution). The RealSense’s IMU gives accelerometer and gyroscope data which can complement wheel odometry and aid in state estimation through sensor fusion. The camera connects via USB 3.0 to the onboard computer. It typically operates at up to 90 FPS for the depth stream (depending on resolution). It should be mounted with a clear view of the forward direction of travel.
@@ -508,7 +635,7 @@ All sensor data streams are handled by ROS 2 drivers:
 
 The fusion of LiDAR and camera data allows the LunarBot to create a detailed map of its environment and navigate or plan arm operations accordingly.
 
-## 7.5 Manipulator System
+## 8.5 Manipulator System
 For performing tasks such as picking up samples or manipulating objects, the LunarBot is equipped with a robotic arm and gripper:
 - Robotic Arm (Manipulator): A Realman RM-75 robotic arm is mounted on the rover. This arm has 7 degrees of freedom (7-DOF), which provides a human-arm-like range of motion (it can position its end-effector in 3D space with various orientations, and the extra joints allow for maneuverability in confined spaces or to avoid obstacles). Key specifications of the arm include:
   - Payload: (Not given explicitly, but an RM-75 typically can handle a few kilograms at full extension.)
@@ -527,7 +654,7 @@ For performing tasks such as picking up samples or manipulating objects, the Lun
 
 Combined, the manipulator and gripper give the LunarBot the ability to interact with its environment – from picking up samples, deploying instruments, to assisting in navigation by clearing small obstacles. In operation, the arm can either be teleoperated (via joystick or pre-scripted moves) or operate semi-autonomously (via motion planning). The ROS MoveIt2 integration suggests that complex motions can be planned to avoid collisions with the rover itself and ensure stable arm trajectories.
 
-## 7.6 Performance and Environmental Specs
+## 8.6 Performance and Environmental Specs
 
 (Additional specifications that might be of interest, though not explicitly provided in sources, can be listed if known or left for user to fill out):
 - Top Speed: ~ (TBD by user) m/s. The actual maximum speed of the rover depends on motor specs and gear ratio. Likely on the order of 1–2 m/s for a planetary rover (safe controllable speed). [User to fill]
@@ -540,7 +667,7 @@ Operating Temperature Range: (TBD, based on components, e.g., –10 °C to 50 
 
 <br/>
 
-# 8. Appendix
+# 9. Appendix
 ## A. Additional Resources and References
 For further information, detailed component documentation, and support, refer to the following resources:
 - Kinco Servo Drive Manuals: Documentation for the Kinco (or equivalent) motor drivers used for the wheel motors. These manuals provide information on LED error codes, parameter tuning, CAN commands, and wiring. They are invaluable for troubleshooting servo-specific issues (e.g., if a drive faults due to overcurrent, etc.). Refer to Kinco’s official website or the provided manual in the lab’s documentation repository.
