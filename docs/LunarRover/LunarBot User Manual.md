@@ -211,6 +211,7 @@ nmcli connection modify "Wired connection 1" ipv4.gateway ""
 (Use the actual connection name for the wired interface if it’s different, and ensure the interface name corresponds to the manipulator’s cable. The gateway is set blank to avoid overriding the default route used by Wi-Fi.)
 
 ![Set_Static_IPv4](../../static/img/rm_ipv4.png)
+<br>
 *Figure 9: Setting a static IPv4 address (192.168.1.100) for the manipulator Ethernet interface on the rover’s PC*
 
 3. Maintain Wi-Fi for Internet/Control: Ensure the rover’s Wi-Fi interface (connected to the onboard router) is set to use DHCP (automatic IP). This is usually default. In NetworkManager:
