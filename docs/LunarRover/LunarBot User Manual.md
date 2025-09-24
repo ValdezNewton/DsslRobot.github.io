@@ -59,9 +59,11 @@ The LunarBot’s chassis is the main body that houses batteries, electronics, an
 The LunarBot uses two 24 V graphene battery packs as its low-voltage power source (for the chassis electronics and manipulator). The two 24 V power cells should be placed side-by-side, as shown in Figure 3. Mount these battery packs securely to the bottom-rear area of the chassis frame (the designated battery bay) as illustrated in Figure 4. Use the provided brackets or straps to hold the batteries in place so they do not shift during rover motion.
 
 ![24V_Battery](../../static/img/2x_24V_batteries.jpg)
+<br>
 *Figure 3: Two 24 V power cells (low-voltage batteries) side by side*
 
 ![24V_Battery_Location](../../static/img/DSSL_External_Components/24V_Battery_Location.png)
+<br>
 *Figure 4: Installation location of the 24 V power cells at the rear underside of the chassis*
 
 After installing, connect the output leads of the 24 V batteries to the rover’s power distribution system as instructed (but do not turn them on until the installation is complete and all components are connected, as per the Operation chapter). Each 24 V battery typically supplies the drive servos and on-board computer; having two in parallel or dedicated to different subsystems can increase the available current capacity.
@@ -70,21 +72,25 @@ After installing, connect the output leads of the 24 V batteries to the rover�
 The high-voltage power source for the drive motors is a single 48 V graphene battery pack. Install the 48 V power cell inside the chassis compartment designed to house it. Ensure it is firmly seated and the wiring is routed safely. The 48 V battery includes a USB configuration interface (seen in Figure 5) which can be used to program the battery’s internal management system – for example, setting an auto-shutdown timer to cut off power after a period of inactivity, to prevent the battery from over-discharging. If required, connect this configuration port to a PC and use the manufacturer’s software to adjust settings (refer to the battery manual). Once configured, connect the 48 V battery output to the rover’s power input (high-voltage line for motor drivers), but keep it switched off until final power-on.
 
 ![48V_Battery_Configuration_USB](../../static/img/DSSL_External_Components/48V_battery_configuration_USB.png)
+<br>
 *Figure 5: Configuration USB interface of the 48 V power cell (for setting auto-shutdown, etc.)*
 
 ### 2.1.3 Onboard Router Installation
 Each LunarBot is equipped with an onboard Wi-Fi router mounted inside the chassis (typically at the bottom of the rover, see Figure 6). Install the router in its designated spot and secure it with screws or velcro as provided. This router serves as the communication hub for the rover’s local network: it assigns IP addresses and manages data exchange between the onboard devices – such as the navigation computer (NUC), LiDAR, and camera – and also enables connectivity between multiple rovers. Ensure the router’s antennas (if external) are properly attached and oriented for optimal signal coverage. 
 
 ![router_location](../../static/img/DSSL_External_Components/router_location.png)
+<br>
 *Figure 6: Onboard Wi-Fi router mounted on the LunarBot chassis*
 
 ![lunarbot_router](../../static/img/DSSL_External_Components/BE3600_router.png)
+<br>
 *Figure 7: LunarBot router*
 
 In a multi-rover setup, each rover has its own router, and a separate base station router (or dedicated hotspot) is used to link the rovers with the user’s control computer. Make sure the LunarBot’s router is powered (it will draw from the rover’s low-voltage power system) and turned on. Verify that you also have a user-side router or hotspot prepared (the default provided unit is a portable router named "REDMI"). Figure 8 shows the user’s networking device which will be used to connect the ground control station (user PC) to the rovers’ network. More details on network configuration and IP addresses are provided in Chapter 3 (IP Configuration and Network Setup).
 
 ![user_router](../../static/img/DSSL_External_Components/user_router.png)
-*Figure 7: User’s router/hotspot for connecting the control PC to the LunarBot network*
+<br>
+*Figure 8: User’s router/hotspot for connecting the control PC to the LunarBot network*
 
 <br/>
 
