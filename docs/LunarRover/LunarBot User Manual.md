@@ -10,9 +10,11 @@ last_update:
 Thank you for choosing the LunarBot Robotic Rover. This manual provides comprehensive instructions for the assembly, operation, and maintenance of the LunarBot. Developed by the Distributed and Intelligent Space Systems Lab (DSSL) at Tsinghua University, the LunarBot is an uncrewed robotic rover designed for lunar surface exploration, data collection, and terrain imaging. It features a rugged four-wheeled chassis with independent steering and drive on each wheel, a multi-modal sensor suite, and a 7-degree-of-freedom robotic arm for manipulation tasks.
 
 ![LunarBot Concept](../../static/img/LunarBot_Concept.png)
+<br>
 *Figure 1: The LunarBot Conceptual Design Rendering*
 
 ![LunarBot](../../static/img/LunarBot.jpeg)
+<br>
 *Figure 2: LunarBot Prototype Rover*
 
 **Key Features**: The LunarBot integrates advanced mechanisms and systems to enable reliable operation in harsh environments:
